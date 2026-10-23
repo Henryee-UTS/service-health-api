@@ -5,3 +5,18 @@ __pycache__
 .pytest_cache
 *.pyc
 .DS_Store
+
+# Terraform files
+terraform/
+terraform-aws/
+**/.terraform/
+**/*.tfstate
+**/*.tfstate.*
+
+# Local configuration
+.env
+.env.*
+
+# Development-only files
+tests/
+.pytest_cache/
