@@ -29,3 +29,44 @@ jobs:
 
       - name: Run tests
         run: pytest -v
+
+  docker-build:
+    name: Docker Image Build
+    needs: quality-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t service-health-api:ci .
+
+  terraform-checks:
+    name: Terraform Validation
+    needs: quality-and-test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        directory:
+          - terraform
+          - terraform-aws
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.16.5"
+
+      - name: Check Terraform formatting
+        run: terraform -chdir=${{ matrix.directory }} fmt -check
+
+      - name: Initialise Terraform
+        run: terraform -chdir=${{ matrix.directory }} init -backend=false -input=false
+
+      - name: Validate Terraform configuration
+        run: terraform -chdir=${{ matrix.directory }} validate
